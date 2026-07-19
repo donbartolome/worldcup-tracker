@@ -51,6 +51,14 @@ comfort — NOT to produce production-grade software.
 - Imperative mood, lowercase, no trailing period
 - Branch names match the commit type prefix, e.g. chore/devcontainer-setup
 - Committing locally is fine without asking; ask before pushing
+- Use plain `git` for local repo operations: status, diff, add, commit,
+  branch, checkout, log, merge, and pushing/pulling to/from the existing
+  remote.
+- Use `gh` (GitHub CLI, available via the devcontainer feature) for
+  anything that talks to the GitHub API beyond a bare push/pull: creating
+  or viewing PRs, checking PR/CI status, commenting on issues or PRs, and
+  viewing workflow runs. Prefer `gh` over opening github.com in a browser
+  for these.
 
 ## Keep this file current
 - Whenever we hit a gotcha, make a non-obvious decision, or establish a
