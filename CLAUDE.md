@@ -24,7 +24,7 @@ comfort — NOT to produce production-grade software.
 - FastAPI app, single-file for now (`main.py`)
 - Devcontainer config lives in `.devcontainer/` (`devcontainer.json`,
   `compose.yaml`, `Dockerfile`, `devcontainer-lock.json`) — Compose-based,
-  `app` + `db` (Postgres 16) services
+  `app` + `db` (Postgres 18) services
 - Postgres is provisioned but UNUSED so far — don't add DB code until I
   explicitly start a phase that calls for it
 - Run locally with: `fastapi dev` (wraps uvicorn + auto-reload)
