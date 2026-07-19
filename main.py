@@ -1,7 +1,7 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import FastAPI
-from pydantic import BaseModel
+from pydantic import AwareDatetime, BaseModel
 
 app = FastAPI()
 
@@ -14,7 +14,7 @@ class MatchBase(BaseModel):
     id: int
     home_team: str
     away_team: str
-    kickoff_time: datetime
+    kickoff_time: AwareDatetime
 
 
 class Fixture(MatchBase):
@@ -31,13 +31,13 @@ FIXTURES = [
         id=1,
         home_team="Team A",
         away_team="Team B",
-        kickoff_time=datetime(2026, 6, 12, 18, 0),
+        kickoff_time=datetime(2026, 7, 25, 18, 0, tzinfo=timezone.utc),
     ),
     Fixture(
         id=2,
         home_team="Team C",
         away_team="Team D",
-        kickoff_time=datetime(2026, 6, 13, 21, 0),
+        kickoff_time=datetime(2026, 7, 26, 21, 0, tzinfo=timezone.utc),
     ),
 ]
 
@@ -46,7 +46,7 @@ RESULTS = [
         id=101,
         home_team="Team E",
         away_team="Team F",
-        kickoff_time=datetime(2026, 6, 10, 18, 0),
+        kickoff_time=datetime(2026, 6, 10, 18, 0, tzinfo=timezone.utc),
         home_score=2,
         away_score=1,
     ),
@@ -54,7 +54,7 @@ RESULTS = [
         id=102,
         home_team="Team G",
         away_team="Team H",
-        kickoff_time=datetime(2026, 6, 11, 15, 0),
+        kickoff_time=datetime(2026, 6, 11, 15, 0, tzinfo=timezone.utc),
         home_score=0,
         away_score=0,
     ),
