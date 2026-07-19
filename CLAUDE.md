@@ -22,7 +22,9 @@ comfort — NOT to produce production-grade software.
 
 ## Project structure
 - FastAPI app, single-file for now (`main.py`)
-- Devcontainer: Compose-based, `app` + `db` (Postgres 16) services
+- Devcontainer config lives in `.devcontainer/` (`devcontainer.json`,
+  `compose.yaml`, `Dockerfile`, `devcontainer-lock.json`) — Compose-based,
+  `app` + `db` (Postgres 16) services
 - Postgres is provisioned but UNUSED so far — don't add DB code until I
   explicitly start a phase that calls for it
 - Run locally with: `fastapi dev` (wraps uvicorn + auto-reload)
@@ -30,16 +32,16 @@ comfort — NOT to produce production-grade software.
 ## Devcontainer conventions
 - Any new named volume mounted onto a path that doesn't already exist in
   the base image needs its target directory created and chowned to
-  `vscode` in the Dockerfile — otherwise Docker initializes it root-owned
-  and vscode-run processes can't write to it (bit us with ~/.claude and
-  ~/.config/gh).
+  `vscode` in `.devcontainer/Dockerfile` — otherwise Docker initializes it
+  root-owned and vscode-run processes can't write to it (bit us with
+  ~/.claude and ~/.config/gh).
 - When adding a tool that needs persistent config/credentials, update
-  together: (1) devcontainer feature or Dockerfile install, (2)
-  compose.yaml volume mount, (3) Dockerfile mkdir+chown above. Treat these
-  as one change, not three separate asks.
+  together: (1) devcontainer feature or `.devcontainer/Dockerfile` install,
+  (2) `.devcontainer/compose.yaml` volume mount, (3) the mkdir+chown above.
+  Treat these as one change, not three separate asks.
 - Reproducibility matters here: pin image/service versions explicitly
-  (no `latest` tags), keep devcontainer-lock.json committed, and disable
-  auto-updaters for tools running inside the container (e.g.
+  (no `latest` tags), keep `.devcontainer/devcontainer-lock.json` committed,
+  and disable auto-updaters for tools running inside the container (e.g.
   DISABLE_AUTOUPDATER) rather than letting them silently drift from what's
   declared in config.
 
