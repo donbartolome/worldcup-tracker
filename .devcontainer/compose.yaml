@@ -6,6 +6,7 @@ services:
     volumes:
       - ..:/workspace:cached
       - claude-code-config:/home/vscode/.claude
+      - gh-config:/home/vscode/.config/gh
     command: sleep infinity
     depends_on:
       - db
@@ -25,3 +26,4 @@ services:
 volumes:
   db-data:
   claude-code-config:
+  gh-config:
