@@ -1,6 +1,8 @@
 services:
   app:
-    image: mcr.microsoft.com/devcontainers/python:3.14
+    build:
+      context: .
+      dockerfile: Dockerfile
     volumes:
       - ..:/workspace:cached
       - claude-code-config:/home/vscode/.claude
