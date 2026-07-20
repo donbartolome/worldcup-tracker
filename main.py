@@ -1,6 +1,6 @@
 from datetime import datetime, timezone
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import AwareDatetime, BaseModel
 
 app = FastAPI()
@@ -71,6 +71,14 @@ def read_root():
 @app.get("/fixtures")
 def get_fixtures() -> list[Fixture]:
     return FIXTURES
+
+
+@app.get("/fixtures/{fixture_id}")
+def get_fixture(fixture_id: int) -> Fixture:
+    for fixture in FIXTURES:
+        if fixture.id == fixture_id:
+            return fixture
+    raise HTTPException(status_code=404, detail="Fixture not found")
 
 
 @app.get("/results")
