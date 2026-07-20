@@ -75,10 +75,10 @@ def get_fixtures() -> list[Fixture]:
 
 @app.get("/fixtures/{fixture_id}")
 def get_fixture(fixture_id: int) -> Fixture:
-    for fixture in FIXTURES:
-        if fixture.id == fixture_id:
-            return fixture
-    raise HTTPException(status_code=404, detail="Fixture not found")
+    fixture = next((f for f in FIXTURES if f.id == fixture_id), None)
+    if fixture is None:
+        raise HTTPException(status_code=404, detail="Fixture not found")
+    return fixture
 
 
 @app.get("/results")
