@@ -21,7 +21,8 @@ comfort — NOT to produce production-grade software.
   together (see Devcontainer conventions below).
 
 ## Project structure
-- FastAPI app, single-file for now (`main.py`)
+- FastAPI app in `main.py`; SQLAlchemy engine/session/ORM model layer in
+  `db.py` (not wired into endpoints yet)
 - Devcontainer config lives in `.devcontainer/` (`devcontainer.json`,
   `compose.yaml`, `Dockerfile`, `devcontainer-lock.json`) — Compose-based,
   `app` + `db` (Postgres 18) services
