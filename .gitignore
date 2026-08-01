@@ -234,3 +234,9 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode,linux,windows
+
+### Claude Code ###
+# Personal local settings (permission overrides, etc.) - not shared
+.claude/settings.local.json
+# Personal instructions that augment CLAUDE.md - not shared
+CLAUDE.local.md
