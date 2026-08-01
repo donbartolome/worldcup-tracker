@@ -26,6 +26,10 @@ class Match(Base):
     kickoff_time: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     home_score: Mapped[int | None] = mapped_column(default=None)
     away_score: Mapped[int | None] = mapped_column(default=None)
+    # Penalty shootout scores - NULL unless the match went to penalties
+    # (i.e. unplayed, or settled in regulation/extra time).
+    home_penalties: Mapped[int | None] = mapped_column(default=None)
+    away_penalties: Mapped[int | None] = mapped_column(default=None)
 
 
 # FastAPI dependency: `Depends(get_db)` gives a handler a session and closes
