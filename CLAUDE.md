@@ -23,6 +23,10 @@ comfort — NOT to produce production-grade software.
 ## Project structure
 - FastAPI app in `main.py`; SQLAlchemy engine/session/ORM model layer in
   `db.py` (not wired into endpoints yet)
+- `Base.metadata.create_all()` only creates *missing* tables — it never
+  adds columns to an existing one. Schema changes currently require
+  dropping and recreating the table (fine while it's empty); once real
+  data exists, that's the signal to adopt Alembic.
 - Devcontainer config lives in `.devcontainer/` (`devcontainer.json`,
   `compose.yaml`, `Dockerfile`, `devcontainer-lock.json`) — Compose-based,
   `app` + `db` (Postgres 18) services
