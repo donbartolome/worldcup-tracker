@@ -39,4 +39,5 @@ def get_db() -> Generator[Session, None, None]:
         db.close()
 
 
-Base.metadata.create_all(engine)
+if __name__ == "__main__":
+    Base.metadata.create_all(engine)
