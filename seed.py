@@ -93,7 +93,8 @@ MATCHES = [
      "home_penalties": None, "away_penalties": None, "kickoff_time": "2026-07-19"},  # AET
 ]
 
-assert len(MATCHES) == 32, f"expected 32 matches, got {len(MATCHES)}"
+if len(MATCHES) != 32:
+    raise ValueError(f"expected 32 matches, got {len(MATCHES)}")
 
 
 def seed():
