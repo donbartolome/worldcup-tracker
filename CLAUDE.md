@@ -24,14 +24,18 @@ comfort — NOT to produce production-grade software.
 - FastAPI app in `main.py`; SQLAlchemy engine/session/ORM model layer in
   `db.py` (not wired into endpoints yet)
 - `Base.metadata.create_all()` only creates *missing* tables — it never
-  adds columns to an existing one. Schema changes currently require
-  dropping and recreating the table (fine while it's empty); once real
-  data exists, that's the signal to adopt Alembic.
+  adds columns to an existing one. The table now holds real seeded data,
+  so the next schema change should use Alembic rather than another
+  drop-and-recreate (which would destroy it).
+- `Match` has no `round`/stage column — round grouping (R32, R16, QF, SF,
+  Final) exists only as comments in `seed.py`. Adding it later is a
+  schema change.
 - Devcontainer config lives in `.devcontainer/` (`devcontainer.json`,
   `compose.yaml`, `Dockerfile`, `devcontainer-lock.json`) — Compose-based,
   `app` + `db` (Postgres 18) services
-- Postgres is provisioned but UNUSED so far — don't add DB code until I
-  explicitly start a phase that calls for it
+- Postgres is in active use: `db.py` (engine/session/ORM), `tests/test_db.py`,
+  and `seed.py` (32 seeded knockout matches) all exist. Not yet wired into
+  `main.py`'s endpoints.
 - Run locally with: `fastapi dev` (wraps uvicorn + auto-reload)
 
 ## Devcontainer conventions
@@ -76,6 +80,6 @@ comfort — NOT to produce production-grade software.
   going along with the newer instruction.
 
 ## Current phase
-Phase 0: environment setup + hello-world endpoint. Devcontainer, tooling,
-and git conventions are settled; the actual first Claude Code session
-against the app code is still pending.
+Phase 1: persistence layer. Devcontainer, tooling, and git conventions are
+settled; `db.py`'s SQLAlchemy layer, pytest, and seeded knockout-stage data
+are in place but not yet wired into `main.py`'s endpoints.
