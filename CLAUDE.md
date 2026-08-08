@@ -22,7 +22,8 @@ comfort — NOT to produce production-grade software.
 
 ## Project structure
 - FastAPI app in `main.py`; SQLAlchemy engine/session/ORM model layer in
-  `db.py` (not wired into endpoints yet)
+  `db.py`, wired into `main.py`'s `GET /fixtures`, `GET /fixtures/{id}`,
+  and `GET /results` endpoints via `get_db()`
 - `Base.metadata.create_all()` only creates *missing* tables — it never
   adds columns to an existing one. The table now holds real seeded data,
   so the next schema change should use Alembic rather than another
@@ -34,8 +35,9 @@ comfort — NOT to produce production-grade software.
   `compose.yaml`, `Dockerfile`, `devcontainer-lock.json`) — Compose-based,
   `app` + `db` (Postgres 18) services
 - Postgres is in active use: `db.py` (engine/session/ORM), `tests/test_db.py`,
-  and `seed.py` (32 seeded knockout matches) all exist. Not yet wired into
-  `main.py`'s endpoints.
+  and `seed.py` (32 seeded knockout matches) all exist. `GET /fixtures`,
+  `GET /fixtures/{id}`, and `GET /results` in `main.py` are wired to real
+  queries via `get_db()`.
 - Run locally with: `fastapi dev` (wraps uvicorn + auto-reload)
 
 ## Devcontainer conventions
@@ -53,6 +55,9 @@ comfort — NOT to produce production-grade software.
   and disable auto-updaters for tools running inside the container (e.g.
   DISABLE_AUTOUPDATER) rather than letting them silently drift from what's
   declared in config.
+- Container Tools VS Code extension was removed — not needed for this
+  project's workflow (no real use for its container-management UI beyond
+  what the devcontainer CLI/Docker Compose already covers).
 
 ## Git conventions
 - Commit messages follow Conventional Commits: `type(scope): description`
@@ -80,6 +85,8 @@ comfort — NOT to produce production-grade software.
   going along with the newer instruction.
 
 ## Current phase
-Phase 1: persistence layer. Devcontainer, tooling, and git conventions are
-settled; `db.py`'s SQLAlchemy layer, pytest, and seeded knockout-stage data
-are in place but not yet wired into `main.py`'s endpoints.
+Phase 3: Claude Code power features (subagents, custom slash commands, MCP
+servers), preceded by a short warm-up to close out Phase 2 loose ends —
+wiring `GET /fixtures`/`GET /results` to real Postgres queries, adopting
+Alembic, and adding a `round`/stage column to `Match` as the first real
+migration under it.

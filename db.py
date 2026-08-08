@@ -33,8 +33,7 @@ class Match(Base):
 
 
 # FastAPI dependency: `Depends(get_db)` gives a handler a session and closes
-# it after the request, even if the handler raises. Not wired into any
-# endpoint yet.
+# it after the request, even if the handler raises.
 def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
