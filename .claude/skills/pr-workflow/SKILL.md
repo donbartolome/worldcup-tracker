@@ -19,11 +19,13 @@ shape and reviewer-comment triage.
   `Co-Authored-By: Claude <noreply@anthropic.com>` (no specific model name —
   which model made the change can vary between sessions, and a hardcoded
   name in the trailer would drift out of sync).
-- Push with `-u`, then `gh pr create` with a body split into `## Summary`
-  (bullets on what/why) and `## Test plan` (checklist of what was actually
-  verified — not aspirational, only what you ran).
-- Pushing and opening the PR are fine without asking (per CLAUDE.md); ask
-  before force-pushing to an existing PR branch.
+- CLAUDE.md says ask before pushing — a user instruction that already
+  covers the push (e.g. "push this branch," "create a PR") counts as that
+  ask; don't push proactively on top of an unrelated request.
+- Once pushing is confirmed: push with `-u`, then `gh pr create` with a
+  body split into `## Summary` (bullets on what/why) and `## Test plan`
+  (checklist of what was actually verified — not aspirational, only what
+  you ran).
 
 ## 2. Triage automated review comments
 
