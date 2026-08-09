@@ -16,7 +16,9 @@ shape and reviewer-comment triage.
 - Branch name matches the commit type prefix (`feat/...`, `fix/...`, etc. —
   see CLAUDE.md).
 - Commit message: Conventional Commits, imperative mood, ends with
-  `Co-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>`.
+  `Co-Authored-By: Claude <noreply@anthropic.com>` (no specific model name —
+  which model made the change can vary between sessions, and a hardcoded
+  name in the trailer would drift out of sync).
 - Push with `-u`, then `gh pr create` with a body split into `## Summary`
   (bullets on what/why) and `## Test plan` (checklist of what was actually
   verified — not aspirational, only what you ran).
@@ -43,8 +45,12 @@ hypothetical future requirements). A comment can be technically correct
 about the code and still not worth acting on right now.
 
 Decide per comment:
-- **Valid and worth fixing now** → make the change, then reply on the
-  thread summarizing what changed.
+- **Valid and worth fixing now** → make the change as a new commit on the
+  PR branch (don't amend/force-push — that would rewrite history the
+  reviewer already commented against and orphan the thread's context).
+  Rerun the relevant tests (or the full suite, if the change touches
+  shared code) before replying — "fixed" on a thread means verified, not
+  just edited. Then reply on the thread summarizing what changed.
 - **Valid concern, not worth fixing now** → reply explaining why (what
   makes it unreachable/out of scope today) and what would make it worth
   revisiting later. Don't silently ignore it.
@@ -86,8 +92,9 @@ mutation {
 }'
 ```
 
-Only resolve a thread once it's actually been addressed (fixed, or replied
-to with a reason) — don't resolve just to clear the UI.
+Only resolve a thread once it's actually been addressed (fixed and
+verified, or replied to with a reason) — don't resolve just to clear the
+UI.
 
 ## 4. Merge
 
