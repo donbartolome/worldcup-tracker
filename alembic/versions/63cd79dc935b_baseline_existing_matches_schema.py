@@ -15,6 +15,12 @@ while the model still had no `round` column) exists only so a FRESH database
 can be built from migrations alone - with a `pass` body here, upgrading a
 fresh database would crash on the next revision trying to ALTER a table that
 was never created.
+
+Guarded with has_table(): this revision is meant to be applied to an
+existing database via `alembic stamp`, never `upgrade`. If someone runs
+`upgrade` against a database that already has `matches` by mistake, the
+guard makes that a clean no-op instead of a generic "relation already
+exists" error from Postgres.
 """
 from typing import Sequence, Union
 
@@ -31,6 +37,8 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Upgrade schema."""
+    if sa.inspect(op.get_bind()).has_table('matches'):
+        return
     op.create_table('matches',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('home_team', sa.String(), nullable=False),
