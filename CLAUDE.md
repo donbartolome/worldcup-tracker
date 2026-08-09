@@ -95,6 +95,15 @@ comfort — NOT to produce production-grade software.
   here, flag the conflict and propose the correction, rather than silently
   going along with the newer instruction.
 
+## Custom commands
+- `/triage-pr <pr-number>` (`.claude/commands/triage-pr.md`) — runs the
+  triage/reply/resolve portion (sections 2-3) of the `pr-workflow` skill
+  against a given PR: fetch automated review comments, evaluate each on
+  merit, reply, and resolve addressed threads. Deliberately scoped to stop
+  before merging (skill section 4) — merging stays a separate, explicit
+  step. `allowed-tools` is left unset so its `gh` calls still hit normal
+  permission prompts like the rest of the skill.
+
 ## Current phase
 Phase 2 warm-up is done: `GET /fixtures`/`GET /fixtures/{id}`/`GET /results`
 are wired to real Postgres queries, Alembic is adopted, and `Match.round`
