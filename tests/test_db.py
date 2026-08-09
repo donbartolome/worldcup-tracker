@@ -9,6 +9,7 @@ def test_insert_and_query_match(db_session):
     match = Match(
         home_team="Test A",
         away_team="Test B",
+        round="R32",
         kickoff_time=KICKOFF_TIME,
     )
     db_session.add(match)
@@ -31,6 +32,7 @@ def test_insert_penalty_decided_match(db_session):
     match = Match(
         home_team="Test A",
         away_team="Test B",
+        round="QF",
         kickoff_time=KICKOFF_TIME,
         home_score=1,
         away_score=1,

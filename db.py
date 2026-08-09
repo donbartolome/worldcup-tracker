@@ -24,6 +24,11 @@ class Match(Base):
     home_team: Mapped[str]
     away_team: Mapped[str]
     kickoff_time: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    # Knockout stage: "R32", "R16", "QF", "SF", "3P" (3rd place playoff), "F".
+    # Plain string rather than a DB enum - see CLAUDE.md for the tradeoff;
+    # short version is this project favors "adding a stage later is just
+    # data" over DB-level validation.
+    round: Mapped[str]
     home_score: Mapped[int | None] = mapped_column(default=None)
     away_score: Mapped[int | None] = mapped_column(default=None)
     # Penalty shootout scores - NULL unless the match went to penalties

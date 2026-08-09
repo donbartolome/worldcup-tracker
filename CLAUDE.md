@@ -25,12 +25,23 @@ comfort — NOT to produce production-grade software.
   `db.py`, wired into `main.py`'s `GET /fixtures`, `GET /fixtures/{id}`,
   and `GET /results` endpoints via `get_db()`
 - `Base.metadata.create_all()` only creates *missing* tables — it never
-  adds columns to an existing one. The table now holds real seeded data,
-  so the next schema change should use Alembic rather than another
-  drop-and-recreate (which would destroy it).
-- `Match` has no `round`/stage column — round grouping (R32, R16, QF, SF,
-  Final) exists only as comments in `seed.py`. Adding it later is a
-  schema change.
+  adds columns to an existing one. Schema changes now go through Alembic
+  (`alembic/`, config in `alembic.ini`); `env.py` reuses `db.py`'s engine
+  rather than reading `DATABASE_URL` a second time. Run `alembic` from the
+  repo root — `prepend_sys_path = .` in `alembic.ini` is CWD-relative, and
+  that's what lets `env.py` `import db`. After pulling a migration, run
+  `alembic upgrade head`. `create_all` and Alembic are now two separate
+  schema sources: on a wiped `db-data` volume, build from migrations
+  (`alembic upgrade head`), not `python db.py` — the latter would create
+  the current-model schema without an `alembic_version` row, and the next
+  `alembic upgrade head` would then fail trying to add a column that
+  already exists.
+- `Match.round` is a real column (`R32`, `R16`, `QF`, `SF`, `3P` for the
+  3rd-place playoff, `F`) — plain `String`, not a DB enum. Tradeoff: no
+  DB-level validation, but adding a stage value later is just data, no
+  migration required. `seed.py`'s round comments are kept as
+  human-readable cross-checks for date-window/exact-approx provenance,
+  not as the source of truth anymore.
 - Devcontainer config lives in `.devcontainer/` (`devcontainer.json`,
   `compose.yaml`, `Dockerfile`, `devcontainer-lock.json`) — Compose-based,
   `app` + `db` (Postgres 18) services
@@ -85,8 +96,7 @@ comfort — NOT to produce production-grade software.
   going along with the newer instruction.
 
 ## Current phase
-Phase 3: Claude Code power features (subagents, custom slash commands, MCP
-servers), preceded by a short warm-up to close out Phase 2 loose ends —
-wiring `GET /fixtures`/`GET /results` to real Postgres queries, adopting
-Alembic, and adding a `round`/stage column to `Match` as the first real
-migration under it.
+Phase 2 warm-up is done: `GET /fixtures`/`GET /fixtures/{id}`/`GET /results`
+are wired to real Postgres queries, Alembic is adopted, and `Match.round`
+is a real column via Alembic's first real migration. Next up: Phase 3,
+Claude Code power features (subagents, custom slash commands, MCP servers).
