@@ -15,9 +15,9 @@ Fetch both the review summary and inline comments — the summary alone often
 omits "suppressed" comments that are still worth reading:
 
 ```bash
-gh repo view --json nameWithOwner -q .nameWithOwner
+REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
 gh pr view $ARGUMENTS --json reviews -q '.reviews[] | {author: .author.login, body}'
-gh api repos/<owner>/<repo>/pulls/$ARGUMENTS/comments --jq '.[] | {id, path, line, body}'
+gh api --paginate "repos/$REPO/pulls/$ARGUMENTS/comments" -q '.[] | {id, path, line, body}'
 ```
 
 Evaluate each comment on its technical merits per the `pr-workflow` skill's

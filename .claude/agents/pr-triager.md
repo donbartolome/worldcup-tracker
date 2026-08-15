@@ -21,16 +21,14 @@ Never run: `gh api ... -f` / `--method POST`, `gh pr comment`, `gh pr merge`,
 `git push`, or any file edit. If a comment warrants a code change, describe the
 change in your report — do not make it.
 
-Resolve the repo slug yourself rather than hardcoding it:
-`gh repo view --json nameWithOwner -q .nameWithOwner`
-
 ## What to fetch
 
 For the PR number given in your task:
 
 ```bash
+REPO=$(gh repo view --json nameWithOwner -q .nameWithOwner)
 gh pr view <N> --json reviews -q '.reviews[] | {author: .author.login, body}'
-gh api repos/<owner>/<repo>/pulls/<N>/comments --jq '.[] | {id, path, line, body}'
+gh api --paginate "repos/$REPO/pulls/<N>/comments" -q '.[] | {id, path, line, body}'
 ```
 
 ## How to evaluate
