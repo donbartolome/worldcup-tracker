@@ -29,6 +29,12 @@ shape and reviewer-comment triage.
 
 ## 2. Triage automated review comments
 
+`/triage-pr <N>` (`.claude/skills/triage-pr/SKILL.md`) runs the fetch-and-evaluate
+half of this section in the read-only `pr-triager` subagent and returns a verdict
+table with draft replies — useful to keep the bulky `gh api` JSON out of the main
+session's context. It never replies, resolves, or merges; apply its findings
+using the steps below, in this session, same as a manual triage.
+
 Fetch both the review summary and inline comments — the summary alone
 often omits "suppressed" comments that are still worth reading:
 
