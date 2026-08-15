@@ -95,14 +95,25 @@ comfort — NOT to produce production-grade software.
   here, flag the conflict and propose the correction, rather than silently
   going along with the newer instruction.
 
-## Custom commands
-- `/triage-pr <pr-number>` (`.claude/commands/triage-pr.md`) — runs the
-  triage/reply/resolve portion (sections 2-3) of the `pr-workflow` skill
-  against a given PR: fetch automated review comments, evaluate each on
-  merit, reply, and resolve addressed threads. Deliberately scoped to stop
-  before merging (skill section 4) — merging stays a separate, explicit
-  step. `allowed-tools` is left unset so its `gh` calls still hit normal
-  permission prompts like the rest of the skill.
+## Skills, commands, and subagents
+- Custom commands have been merged into skills. `.claude/commands/*.md` still
+  works, but `.claude/skills/<name>/SKILL.md` is the form used in this repo —
+  it supports frontmatter commands can't have (`context: fork`, `agent:`,
+  `disable-model-invocation`, `allowed-tools`, supporting files). For a
+  project skill, the slash name comes from the **directory name**, not the
+  frontmatter `name:` field — one skill directory gets exactly one slash
+  name (a skill's supporting files are reference material, not additional
+  commands; only plugins have a `commands/` subdirectory).
+- `/triage-pr <pr-number>` (`.claude/skills/triage-pr/SKILL.md`) forks into
+  the `pr-triager` subagent (`.claude/agents/pr-triager.md`) to fetch and
+  evaluate a PR's automated review comments, returning a verdict table with
+  draft replies. It's deliberately **read-only**: it never posts, resolves,
+  or merges — those stay in the main session, per `pr-workflow`'s
+  human-in-the-loop rules (check with the user before overruling a design
+  decision; confirm before merging). `pr-triager` preloads the `pr-workflow`
+  skill via its `skills:` field, so the evaluation criteria live in one
+  place — this means `pr-workflow` must keep `disable-model-invocation`
+  unset, since that flag also blocks subagent preloading.
 
 ## Current phase
 Phase 2 warm-up is done: `GET /fixtures`/`GET /fixtures/{id}`/`GET /results`
