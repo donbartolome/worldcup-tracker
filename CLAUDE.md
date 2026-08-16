@@ -69,6 +69,13 @@ comfort — NOT to produce production-grade software.
 - Container Tools VS Code extension was removed — not needed for this
   project's workflow (no real use for its container-management UI beyond
   what the devcontainer CLI/Docker Compose already covers).
+- `~/.claude.json` (where user- and local-scope MCP server config lives)
+  is a *sibling file* of the mounted `/home/vscode/.claude` directory, not
+  inside it — the `claude-code-config` volume only covers the directory.
+  So `claude mcp add` at `-s user` or `-s local` scope is silently lost on
+  a devcontainer rebuild. Use project scope (`.mcp.json`, committed) for
+  anything meant to persist, unless the volume mounts are extended to
+  cover the file too.
 
 ## Git conventions
 - Commit messages follow Conventional Commits: `type(scope): description`
@@ -115,8 +122,34 @@ comfort — NOT to produce production-grade software.
   place — this means `pr-workflow` must keep `disable-model-invocation`
   unset, since that flag also blocks subagent preloading.
 
+## MCP servers
+- `github` (project scope, `.mcp.json`, committed): GitHub's hosted MCP
+  server at `https://api.githubcopilot.com/mcp/readonly`. Read-only
+  endpoint — no PR creation, commenting, resolving, or merging via MCP;
+  those stay on `gh` per `pr-workflow`. Re-pointing to the full endpoint
+  is a one-line URL change if that's ever needed.
+- Auth: `headersHelper` runs `gh auth token` at connect time and passes
+  it as the Authorization header, instead of a separate PAT/OAuth login.
+  No secret lives in `.mcp.json`, which is why committing it to this
+  public repo is safe — it reuses the credential `gh` already manages
+  (rotate/revoke via `gh auth login`/`gh auth logout`, not here).
+- Scope note: user/local-scope servers (`~/.claude.json`) do NOT survive
+  a devcontainer rebuild — see the Devcontainer conventions entry below.
+  That's why this is project-scoped, not user-scoped.
+- Approval: Claude Code only reads `.mcp.json` at session startup, and
+  project-scoped servers need one-time interactive approval. Adding a
+  new server mid-session requires restarting `claude` before its tools
+  become available or approvable.
+- Observed once (fetching PR #20's review comments): the MCP
+  `pull_request_read` tool (`method: get_review_comments`) groups inline
+  comments into review threads with `is_resolved`/`is_outdated` flags
+  built in — gh's raw REST JSON needs a separate GraphQL call for that.
+  Tradeoff: bulkier default response payload than a hand-tuned `gh --jq`
+  filter. Not acted on — `pr-workflow` still uses `gh` for everything.
+
 ## Current phase
 Phase 2 warm-up is done: `GET /fixtures`/`GET /fixtures/{id}`/`GET /results`
 are wired to real Postgres queries, Alembic is adopted, and `Match.round`
-is a real column via Alembic's first real migration. Next up: Phase 3,
-Claude Code power features (subagents, custom slash commands, MCP servers).
+is a real column via Alembic's first real migration. Phase 3 (subagents,
+custom slash commands, MCP servers) is also done — `pr-triager`, `/triage-pr`
+(#19, #20), and the `github` MCP server above. Next up: not yet decided.
