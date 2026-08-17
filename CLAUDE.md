@@ -23,7 +23,16 @@ comfort — NOT to produce production-grade software.
 ## Project structure
 - FastAPI app in `main.py`; SQLAlchemy engine/session/ORM model layer in
   `db.py`, wired into `main.py`'s `GET /fixtures`, `GET /fixtures/{id}`,
-  and `GET /results` endpoints via `get_db()`
+  and `GET /results` endpoints via `get_db()`. `GET /fixtures` and
+  `GET /results` (not the single-fixture lookup) accept an optional
+  `?round=` query param filtering on `Match.round`; the fixture/result
+  response payload now includes `round`.
+- Endpoint tests live in `tests/test_api.py` and use the `client` fixture
+  in the root `conftest.py` — a `TestClient` with `get_db` overridden to
+  the existing `db_session` fixture, so requests hit the same real
+  Postgres session a test inserts into. The DB is seeded (32 played
+  matches via `seed.py`), so endpoint tests insert their own rows and
+  assert relatively rather than assuming an empty table.
 - `Base.metadata.create_all()` only creates *missing* tables — it never
   adds columns to an existing one. Schema changes now go through Alembic
   (`alembic/`, config in `alembic.ini`); `env.py` reuses `db.py`'s engine

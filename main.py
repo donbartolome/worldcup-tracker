@@ -21,6 +21,7 @@ class MatchBase(BaseModel):
     home_team: str
     away_team: str
     kickoff_time: AwareDatetime
+    round: str
 
 
 class Fixture(MatchBase):
@@ -40,12 +41,15 @@ def read_root():
 # The `-> list[Fixture]` return annotation doubles as FastAPI's response
 # model: it validates the output and drives the schema shown in /docs.
 # `Depends(get_db)` hands the handler a DB session and closes it after
-# the request completes.
+# the request completes. `round` is a plain function argument (not a
+# path param and not a Depends), which FastAPI infers as an optional
+# query param - no `Query(...)` import needed.
 @app.get("/fixtures")
-def get_fixtures(db: Session = Depends(get_db)) -> list[Fixture]:
-    matches = db.scalars(
-        select(Match).where(Match.home_score.is_(None))
-    ).all()
+def get_fixtures(round: str | None = None, db: Session = Depends(get_db)) -> list[Fixture]:
+    stmt = select(Match).where(Match.home_score.is_(None))
+    if round is not None:
+        stmt = stmt.where(Match.round == round)
+    matches = db.scalars(stmt).all()
     return [Fixture.model_validate(m) for m in matches]
 
 
@@ -58,8 +62,9 @@ def get_fixture(fixture_id: int, db: Session = Depends(get_db)) -> Fixture:
 
 
 @app.get("/results")
-def get_results(db: Session = Depends(get_db)) -> list[Result]:
-    matches = db.scalars(
-        select(Match).where(Match.home_score.is_not(None))
-    ).all()
+def get_results(round: str | None = None, db: Session = Depends(get_db)) -> list[Result]:
+    stmt = select(Match).where(Match.home_score.is_not(None))
+    if round is not None:
+        stmt = stmt.where(Match.round == round)
+    matches = db.scalars(stmt).all()
     return [Result.model_validate(m) for m in matches]
