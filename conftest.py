@@ -27,5 +27,6 @@ def db_session(_create_tables):
 @pytest.fixture
 def client(db_session):
     app.dependency_overrides[get_db] = lambda: db_session
-    yield TestClient(app)
+    with TestClient(app) as test_client:
+        yield test_client
     app.dependency_overrides.clear()
