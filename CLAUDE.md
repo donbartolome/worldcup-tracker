@@ -91,7 +91,9 @@ comfort — NOT to produce production-grade software.
 - Common types: feat, fix, chore, docs, refactor
 - Imperative mood, lowercase, no trailing period
 - Branch names match the commit type prefix, e.g. chore/devcontainer-setup
-- Committing locally is fine without asking; ask before pushing
+- Committing locally is fine without asking, provided the test suite is
+  green — the PreToolUse hook in the Hooks section enforces this rather
+  than relying on it being remembered. Ask before pushing.
 - Use plain `git` for local repo operations: status, diff, add, commit,
   branch, checkout, log, merge, and pushing/pulling to/from the existing
   remote.
@@ -130,6 +132,40 @@ comfort — NOT to produce production-grade software.
   skill via its `skills:` field, so the evaluation criteria live in one
   place — this means `pr-workflow` must keep `disable-model-invocation`
   unset, since that flag also blocks subagent preloading.
+
+## Hooks
+- A `PreToolUse` hook in `.claude/settings.json` (matcher `Bash`, `if:
+  "Bash(git commit *)"` so it only spawns on actual commit attempts, not
+  every Bash call) runs `.claude/hooks/check-tests-before-commit.sh` before
+  any `git commit` Claude Code attempts. The script runs the test suite
+  from the project root and only lets the commit through on an explicit
+  `pytest` exit 0 — failing tests, a wrong cwd, a missing `pytest`, or a
+  bug in the script itself all block (exit 2), not just a silent
+  pass-through. "Tests weren't run" and "tests passed" are treated as
+  different outcomes on purpose.
+- Bypass: prefixing the commit command with `ALLOW_FAILING_TESTS=1` allows
+  the commit through even with failing tests, but announces it loudly (a
+  `systemMessage` in the transcript plus `additionalContext` naming the
+  failing tests) rather than silently. It's scoped to genuine test
+  failures only — a broken/unrunnable `pytest` is never bypassable. This
+  exists for deliberate TDD red checkpoints (commit the failing test, then
+  the fix) — it is **not** a general "tests are annoying right now"
+  escape hatch.
+- Known gap, found while verifying this: the fail-closed guarantee lives
+  entirely inside the script. If the harness can't invoke the script at
+  all — wrong path in `settings.json`, the script deleted, or its
+  executable bit lost — the hook dispatch itself fails *open*: the commit
+  proceeds silently through normal permission flow, with no error and no
+  warning. So this only protects against "tests are failing," not against
+  "the gate itself stopped existing." If a commit ever goes through
+  suspiciously fast with no test-check status message, verify
+  `.claude/hooks/check-tests-before-commit.sh` is still present and
+  executable.
+- Scope: this only governs commits *Claude Code* makes through its Bash
+  tool. A `git commit` run directly in a terminal, outside Claude Code,
+  is completely unaffected — this is a workflow guard, not a repo-level
+  guarantee (that would be a `.git/hooks/pre-commit` or a CI check, which
+  this isn't).
 
 ## MCP servers
 - `github` (project scope, `.mcp.json`, committed): GitHub's hosted MCP
